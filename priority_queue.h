@@ -9,21 +9,32 @@
 #define PRIORITY_QUEUE_H
 
 #include <queue>
+#include <vector>
 #include "timer.h"
 
 using std::priority_queue;
+using std::vector;
+
+struct timer_comp //重写仿函数
+{
+    bool operator() (yj_timer* a, yj_timer* b) 
+    {
+        return a->get_key() > b->get_key();
+    }
+};
 
 class yj_priority_queue
 {
 public:
-    yj_priority_queue() { yj_pq_.resize(10); }
-    bool yj_pq_is_empty(void);
-    size_t yj_pq_size(void);
-    yj_timer* yj_pq_min(void);
-    int yj_pq_delmin(void);
-    int yj_pq_insert(yj_timer*);
+    yj_priority_queue() { ; }
+    bool is_empty(void) { return yj_pq_.empty(); }
+    size_t size(void) { return yj_pq_.size(); }
+    yj_timer* min(void) { return yj_pq_.top(); }
+    void delmin(void) {  yj_pq_.pop(); }
+    void insert(yj_timer* timer) { yj_pq_.push(timer); }
 
 private:
-    priority_queue<yj_timer*, vector<yj_timer*>, less<int>>  yj_pq_;//自己定义less
+    priority_queue<yj_timer*, vector<yj_timer*>, timer_comp>  yj_pq_;
 };
 
+#endif
