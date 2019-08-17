@@ -38,7 +38,7 @@ namespace CurrentThread
 
   bool isMainThread();
 
-  void sleepUsec(int64_t usec);
+  //void sleepUsec(int64_t usec);
 
 }
 

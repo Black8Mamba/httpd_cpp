@@ -3,7 +3,7 @@
 
 #include "current_thread.h"
 #include "noncopyable.h"
-#include "assert.h"
+#include <assert.h>
 #include <pthread.h>
 
 class MutexLock : noncopyable
