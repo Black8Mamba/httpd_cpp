@@ -11,17 +11,17 @@ public:
     explicit Condition(MutexLock& mutex)
     : mutex_(mutex)
     {
-        assert(pthread_cond_init(&pcond_, NULL));
+        assert(pthread_cond_init(&pcond_, NULL) == 0);
     }
     ~Condition()
     {
-        assert(pthread_cond_destroy(&pcond_));
+        assert(pthread_cond_destroy(&pcond_) == 0);
     }
 
     void wait()
     {
         MutexLock::UnassignGuard ug(mutex_);
-        assert(pthread_cond_wait(&pcond_, mutex_.getPthreadMutex()));
+        assert(pthread_cond_wait(&pcond_, mutex_.getPthreadMutex()) == 0);
     }
 
    // returns true if time out, false otherwise.
@@ -29,12 +29,12 @@ public:
 
     void notify()
     {
-        assert(pthread_cond_signal(&pcond_));
+        assert(pthread_cond_signal(&pcond_) == 0);
     }
 
     void notifyAll()
     {
-        assert(pthread_cond_broadcast(&pcond_));
+        assert(pthread_cond_broadcast(&pcond_) == 0);
     }
 
 private:

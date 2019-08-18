@@ -17,7 +17,7 @@ public:
     ~MutexLock()
     {
         assert(holder_ == 0);
-        assert(pthread_mutex_destroy(&mutex_));
+        assert(pthread_mutex_destroy(&mutex_) == 0);
     }
 
     bool isLockedByThisThread() const
@@ -33,14 +33,14 @@ public:
     // internal usage
     void lock()
     {
-        assert(pthread_mutex_lock(&mutex_));
+        assert(pthread_mutex_lock(&mutex_) == 0);
         assignHolder();
     }
 
     void unlock()
     {
         unassignHolder();
-        assert(pthread_mutex_unlock(&mutex_));
+        assert(pthread_mutex_unlock(&mutex_) == 0);
     }
 
     pthread_mutex_t* getPthreadMutex()
