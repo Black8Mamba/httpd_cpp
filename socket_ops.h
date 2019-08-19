@@ -46,10 +46,10 @@ const struct sockaddr_in6* sockaddr_in6_cast(const struct sockaddr* addr);
 //struct sockaddr_in6 getPeerAddr(int sockfd);
 //bool isSelfConnect(int sockfd);
 
-uint32_t hostToNet32(uint32_t host32) { return htonl(host32); }
-uint16_t hostToNet16(uint16_t host16) { return htons(host16); }
-uint32_t netToHost32(uint32_t net32) { return ntohl(net32); }
-uint16_t netToHost16(uint16_t net16) { return ntohs(net16); }
+uint32_t hostToNet32(uint32_t host32);
+uint16_t hostToNet16(uint16_t host16);
+uint32_t netToHost32(uint32_t net32);
+uint16_t netToHost16(uint16_t net16);
 
 }
 

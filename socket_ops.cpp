@@ -135,3 +135,20 @@ void sockets::from_ip_port(const char* ip, uint16_t port,
 {
     ;
 }
+
+uint32_t sockets::hostToNet32(uint32_t host32) 
+{ 
+    return htonl(host32); 
+}
+uint16_t sockets::hostToNet16(uint16_t host16) 
+{ 
+    return htons(host16); 
+}
+uint32_t sockets::netToHost32(uint32_t net32) 
+{ 
+    return ntohl(net32);
+ }
+uint16_t sockets::netToHost16(uint16_t net16) 
+{ 
+    return ntohs(net16);
+ }
