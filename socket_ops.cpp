@@ -93,7 +93,21 @@ int sockets::connect(int sockfd, const struct sockaddr* addr)
 
 ssize_t sockets::read(int sockfd, void* buf, size_t count)
 {
-    return ::read(sockfd, buf, count);
+    size_t nleft = count;
+    ssize_t nread;
+    char *bufp = static_cast<char*>(buf);
+    while(nleft > 0) {
+        if ((nread = ::read(sockfd, bufp, nleft)) < 0) {
+            if (errno == EINTR)
+                nread = 0;
+            else
+                return -1;
+        } else if (nread == 0)
+            break;
+        nleft -= nread;
+        bufp += nread;
+    }
+    return (count - nleft);
 }
 
 ssize_t sockets::readv(int sockfd, const struct iovec *iov, int iovcnt)
@@ -103,7 +117,21 @@ ssize_t sockets::readv(int sockfd, const struct iovec *iov, int iovcnt)
 
 ssize_t sockets::write(int sockfd, const void *buf, size_t count)
 {
-  return ::write(sockfd, buf, count);
+  size_t nleft = count;
+  ssize_t nwrite;
+  const char *bufp = static_cast<const char*>(buf);
+
+  while(nleft > 0) {
+      if ((nwrite = ::write(sockfd, bufp, nleft)) <= 0) {
+          if (errno == EINTR)
+            nwrite = 0;
+          else
+            return -1;
+      }
+      nleft -= nwrite;
+      bufp += nwrite;
+  }
+    return (count - nleft);
 }
 
 void sockets::close(int sockfd)
