@@ -2,6 +2,7 @@
 #define HTTP_PARSE_H
 
 #include "http_request.h"
+#include "buffer.h"
 
 class HttpParse
 {
@@ -17,8 +18,9 @@ public:
         : state_(kExpectRequestLine)
     { }
 
-    bool parseRequest(char *buf);
+    bool parseRequest(Buffer *buf);
     bool gotAll() const { return state_ == kGotAll; }
+    const HttpRequest*  getRequest() const { return &request_; }
     //void resset();
 
 private:

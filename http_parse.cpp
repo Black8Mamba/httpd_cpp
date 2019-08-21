@@ -1,5 +1,6 @@
 #include "http_parse.h"
 #include <algorithm> 
+#include <iostream>
 
 bool HttpParse:: processRequestLine(const char* begin, 
             const char* end)
@@ -34,4 +35,46 @@ bool HttpParse:: processRequestLine(const char* begin,
     return succeed;
 }
 
-bool HttpParse::parseRequest()
+//has timer;
+bool HttpParse::parseRequest(Buffer* buf)
+{
+    bool ok = true;
+    bool hasMore = true;
+    while(hasMore) {
+        if (state_ == kExpectRequestLine) {
+            const char* crlf = buf->findCRLF();
+            if (crlf) {
+                ok = processRequestLine(buf->peek(), crlf);
+                if (ok) {
+                    //request_设置定时器
+                    buf->retrieveUntil(crlf + 2);
+                    state_ = kExpectHeaders;
+                } else {
+                    hasMore = false;
+                }
+            } else {
+                hasMore = false;
+            }
+        } else if (state_ == kExpectHeaders) {
+            std::cout << "enter kExpectHeaders" << std::endl;
+            const char* crlf = buf->findCRLF();
+            if (crlf) {                
+                const char* colon = std::find(buf->peek(), crlf, ':');
+                if (colon != crlf) {
+                    std::cout << "find : " << std::endl;
+                    request_.addHeader(buf->peek(), colon, crlf);
+                    state_ = kExpectBody;
+                } else {
+                    state_= kGotAll;
+                    hasMore = false;
+                }
+            } else {
+                hasMore = false;
+            }
+        } else if (state_ == kExpectBody) {
+            hasMore = false;
+        }
+    }
+
+    return ok;
+}

@@ -1,3 +1,6 @@
+#ifndef BUFFER_H
+#define BUFFER_H
+
 #include <string>
 #include <algorithm>
 #include <cassert>
@@ -64,6 +67,7 @@ public:
     const char* findEOL() const
     {
         const void* eol = memchr(peek(), '\n', readableBytes());
+        //const char* eol = std::find(peek(), )
         return static_cast<const char*>(eol);
     } 
 
@@ -290,3 +294,5 @@ private:
     size_t writerIndex_;
     static const char kCRLF[];
 };
+
+#endif
