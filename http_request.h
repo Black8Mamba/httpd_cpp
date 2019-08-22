@@ -7,7 +7,9 @@
 #include <string>
 //#include "timer.h"
 #include "buffer.h"
+#include <functional>
 using std::string;
+#include <iostream>
 
 class HttpRequest
 {
@@ -101,7 +103,9 @@ public:
         string value(colon, end);
         while(!value.empty() && isspace(value[value.size()-1]))
             value.resize(value.size()-1);
-        headers_[field] = value;
+        headers_.insert(std::pair<string, string>(field, value));
+        std::cout << field << ":" << value << std::endl;
+       std::cout << "size:" << headers_.size() << std::endl;
     }
 
     string getHeader(const string& field) const
@@ -114,9 +118,31 @@ public:
         return result;
     }
 
+    void addHeaderFunc(const string& field, std::function<void(void)> func)
+    {
+        if (headers_.count(field) != 0) //存在field字段,添加对应函数
+            func_[field] = func;
+    }
+
+    void handleFunc()
+    {
+        for (auto &func : func_) {
+            (func.second)();
+        }
+    }
+
+    void printHeaders()
+    {
+        for (auto &node : headers_) {
+            std::cout << node.first<< ": " << node.second << std::endl;
+        }
+    }
+
     std::map<string,string> headers() const { return headers_; }
     //void swap(HttpRequest& that);
 
+    void setFd(int fd) { fd_ = fd; }
+    int getFd() { return fd_; }
 private:
     int fd_;
     int epoll_fd_;
@@ -127,6 +153,7 @@ private:
     string query_;
    // yj_timer receive_timer_;
     std::map<string,string> headers_;
+    std::map<string, std::function<void(void)>> func_;
 };
 
 #endif
