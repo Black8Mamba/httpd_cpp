@@ -80,7 +80,7 @@ int sockets::accept(int sockfd, struct sockaddr_in* addr)
     if (connfd < 0)
         perror("sockets::accept failed!\n");
 
-    assert(connfd > 0);
+    //assert(connfd > 0);
     return connfd;
 }
 
