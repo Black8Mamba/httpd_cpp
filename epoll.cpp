@@ -16,7 +16,7 @@ EPoll::~EPoll()
     ::close(epoll_fd_);
 }
 
-int EPoll::epoll_add(int fd, http_request* request, int events)
+int EPoll::epoll_add(int fd, HttpRequest* request, int events)
 {
     struct epoll_event event;
     memset(&event, 0, sizeof(event));
@@ -27,7 +27,7 @@ int EPoll::epoll_add(int fd, http_request* request, int events)
     return ret;
 }
 
-int EPoll::epoll_mod(int fd, http_request* request, int events)
+int EPoll::epoll_mod(int fd, HttpRequest* request, int events)
 {
     struct epoll_event event;
     memset(&event, 0, sizeof(event));
@@ -38,7 +38,7 @@ int EPoll::epoll_mod(int fd, http_request* request, int events)
     return ret;
 }
 
-int EPoll::epoll_del(int fd, http_request* request, int events)
+int EPoll::epoll_del(int fd, HttpRequest* request, int events)
 {
     struct epoll_event event;
     memset(&event, 0, sizeof(event));

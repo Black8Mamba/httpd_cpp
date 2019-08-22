@@ -3,20 +3,12 @@
 
 #include <sys/epoll.h>
 #include "noncopyable.h"
+#include "http_request.h"
 #include <unistd.h>
 #include <cstring>
 #include <vector>
 
 #define MAXEVENTS   1024
-
-//temp define;
-class http_request
-{
-public:
-    http_request(int num) { num_ = num; }
-    int num_;
-    //yj_timer* timer_;
-};
 
 
 class EPoll : public noncopyable
@@ -27,9 +19,9 @@ public:
     EPoll(int flags);
     ~EPoll();
 
-    int epoll_add(int fd, http_request* request, int events);
-    int epoll_mod(int fd, http_request* request, int events);
-    int epoll_del(int fd, http_request* request, int events);
+    int epoll_add(int fd, HttpRequest* request, int events);
+    int epoll_mod(int fd, HttpRequest* request, int events);
+    int epoll_del(int fd, HttpRequest* request, int events);
     int epoll_wait(int max_events, int timeout_ms);
     //epoll_hander
 
