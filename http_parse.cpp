@@ -63,11 +63,12 @@ bool HttpParse::parseRequest(Buffer* buf)
                 if (colon != crlf) {
                     std::cout << "find : " << std::endl;
                     request_.addHeader(buf->peek(), colon, crlf);
-                    state_ = kExpectBody;
+                    //state_ = kExpectBody;
                 } else {
                     state_= kGotAll;
                     hasMore = false;
                 }
+                buf->retrieveUntil(crlf + 2);
             } else {
                 hasMore = false;
             }

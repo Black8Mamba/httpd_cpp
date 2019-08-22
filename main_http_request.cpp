@@ -12,7 +12,7 @@ int main(void)
     //HttpRequest request;
     Buffer buf;
     HttpParse parse;
-    char s[] = "GET /index.html HTTP/1.1\r\nHost: hackr.jp\r\n";
+    char s[] = "GET /index.html HTTP/1.1\r\nHost: hackr.jp\r\nConnection:keep-alive\r\n";
     buf.append(s, sizeof(s));
     parse.parseRequest(&buf);
    const  HttpRequest *request = parse.getRequest();
@@ -20,5 +20,6 @@ int main(void)
     cout << request->getVersion() << endl;
     cout << request->getPath() << endl;
     cout <<  request->getHeader("Host") << endl;
+    cout << request->getHeader("Connection") << endl;
     return 0;
 }
