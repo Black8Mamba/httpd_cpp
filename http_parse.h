@@ -14,13 +14,15 @@ public:
         kExpectBody,
         kGotAll,        
     };
-    HttpParse()
-        : state_(kExpectRequestLine)
+    HttpParse(HttpRequest request)
+        : state_(kExpectRequestLine),
+           request_(request) 
     { }
 
     bool parseRequest(Buffer *buf);
     bool gotAll() const { return state_ == kGotAll; }
-    const HttpRequest*  getRequest() const { return &request_; }
+    HttpRequest  getRequest() { return request_; }
+    void setRequest(HttpRequest request) { request_ = request; }
     //void resset();
 
 private:

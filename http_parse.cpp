@@ -1,31 +1,43 @@
 #include "http_parse.h"
 #include <algorithm> 
 #include <iostream>
+#include <iostream>
+using namespace std;
 
 bool HttpParse:: processRequestLine(const char* begin, 
             const char* end)
 {
+    cout << "enter processRequestLine" << endl;
     bool succeed = false;
     const char* start = begin;
     const char* space = std::find(start, end, ' ');
     if (space != end && request_.setMethod(start, space)) {
+        //cout << request_.getMethod() << endl;
+       // cout << request_.methodString() << endl;
         start = space + 1;
         space = std::find(start, end, ' ');
         if (space != end) {
             const char* question = std::find(start, space, '?');
             if (question != space) {
                 request_.setPath(start, question);
+               // cout << request_.getPath() << endl;
                 request_.setQuery(question, space);
+                //cout << request_.getQuery() << endl;
             } else {
                 request_.setPath(start, space);
+                //cout << request_.getPath() << endl;
             }
             start = space + 1;
             succeed = (end - start == 8) && std::equal(start, end-1, "HTTP/1.");
             if (succeed) {
-                if (*(end-1) == '1')
+                if (*(end-1) == '1') {
                     request_.setVersion(HttpRequest::kHttp11);
-                else if (*(end-1) == '0')
+                    //cout << request_.getVersion() << endl;
+                }
+                else if (*(end-1) == '0') {
                     request_.setVersion(HttpRequest::kHttp10);
+                    //cout << request_.getVersion() << endl;
+                }
                 else 
                     succeed = false;
             }
@@ -42,6 +54,7 @@ bool HttpParse::parseRequest(Buffer* buf)
     bool hasMore = true;
     while(hasMore) {
         if (state_ == kExpectRequestLine) {
+            std::cout << "enter kExpectRequestLine" << std::endl;
             const char* crlf = buf->findCRLF();
             if (crlf) {
                 ok = processRequestLine(buf->peek(), crlf);
