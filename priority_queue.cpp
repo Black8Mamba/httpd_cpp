@@ -7,15 +7,20 @@
  */
 
 #include "priority_queue.h"
+#include "http_request.h"
+#include <iostream>
+using namespace std;
 
-void yj_priority_queue::add_timer(http_request* request, 
+void yj_priority_queue::add_timer(HttpRequest* request, 
                                   size_t timeout, 
-                                function<int(http_request*)> func)
+                                function<int(HttpRequest*)> func)
 {
+    cout << "enter add_timer" << endl;
     //申请timer节点
     yj_timer* timer_node = new yj_timer();
+    timer_node->set_request(request);//timer需要request吗,需要的
     //request->timer = timer_node;
-    request->timer_ = timer_node;
+    request->setTimer(timer_node);
     //更新当前时间
     yj_timer::time_update();
     // 加入时设置超时阈值，删除信息,handler等
@@ -28,17 +33,19 @@ void yj_priority_queue::add_timer(http_request* request,
     yj_priority_queue::insert(timer_node);
 }
 
-void yj_priority_queue::del_timer(http_request* request)
+void yj_priority_queue::del_timer(HttpRequest* request)
 {
     //更新当前时间
     yj_timer::time_update();   
-    yj_timer* timer_node = request->timer_;
+    yj_timer* timer_node = request->getTimer();
     timer_node->set_deleted(true);
 }
 
 void yj_priority_queue::handle_expire_timers(void)
 {
+    cout << "enter handle_timers" << endl;
     while(!is_empty()) {    
+        //cout << "queue.size():" << this->size() << endl;
         yj_timer* timer_node = min(); //获取最小节点
         if (timer_node->is_deleted()) { //如果被标记为删除
             delmin(); //pop
@@ -53,7 +60,7 @@ void yj_priority_queue::handle_expire_timers(void)
 
         //超时未被删除 调用handler处理
         if (timer_node->get_func()) {
-            function<int(http_request*)> func = timer_node->get_func();//考虑指针优化
+            function<int(HttpRequest*)> func = timer_node->get_func();//考虑指针优化
             func(timer_node->get_request());
         }
 
