@@ -10,4 +10,3 @@ void yj_timer::time_update()
     int rc = gettimeofday(&tv, NULL); //设置全局变量erron？ return -1？
     yj_timer::current_msec = ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
-

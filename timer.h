@@ -18,7 +18,11 @@ class HttpRequest;
 class yj_timer
 {
 public:
-    yj_timer() { deleted_ = 0; key_ = 0; }  //需要更新当前时间吗？
+    yj_timer() 
+        : deleted_(0),
+            key_(0),
+            request_(NULL)
+     { }  //需要更新当前时间吗？
     void set_key(size_t key) { key_ = key; }
     void set_deleted(bool deleted) { deleted_ = deleted; }
     void set_handler(std::function<int(HttpRequest*)> func) { func_ = func; }
