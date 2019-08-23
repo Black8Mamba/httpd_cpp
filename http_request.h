@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdio>
 #include <string>
-//#include "timer.h"
+#include "timer.h"
 #include "buffer.h"
 #include <functional>
 using std::string;
@@ -25,7 +25,8 @@ public:
 
     HttpRequest()
         : method_(kInvalid),
-            version_(kUnknown)
+            version_(kUnknown),
+            timer_(NULL)
     { }
 
     void setVersion(Version v) { version_ = v; }
@@ -85,6 +86,10 @@ public:
         path_.assign(start, end);
     }
 
+    void setTimer(yj_timer* timer) { timer_ = timer; }
+
+    yj_timer* getTimer() { return timer_; }
+
     const string& getPath() const { return path_; }
 
     void setQuery(const char* start, const char* end)
@@ -104,8 +109,8 @@ public:
         while(!value.empty() && isspace(value[value.size()-1]))
             value.resize(value.size()-1);
         headers_.insert(std::pair<string, string>(field, value));
-        std::cout << field << ":" << value << std::endl;
-       std::cout << "size:" << headers_.size() << std::endl;
+       // std::cout << field << ":" << value << std::endl;
+        //std::cout << "size:" << headers_.size() << std::endl;
     }
 
     string getHeader(const string& field) const
@@ -146,14 +151,13 @@ public:
 private:
     int fd_;
     int epoll_fd_;
-    Buffer buf;
     Method method_;
     Version version_;
     string path_;
     string query_;
-   // yj_timer receive_timer_;
+    yj_timer *timer_;
     std::map<string,string> headers_;
-    std::map<string, std::function<void(void)>> func_;
+    std::map<string, std::function<void(void)>> func_; //header处理函数函数？
 };
 
 #endif

@@ -31,3 +31,13 @@ ssize_t Buffer::readFd(int fd, int* savedErrno)
 
     return n;
 }
+
+ssize_t Buffer::writeFd(int fd, int* savedErrno)
+{
+    int n = ::write(fd, peek(), readableBytes());
+    const size_t readable = readableBytes();
+    if (n < 0)
+        *savedErrno = errno;
+    
+    return n;
+}

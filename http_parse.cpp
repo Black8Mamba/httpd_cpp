@@ -11,31 +11,29 @@ bool HttpParse:: processRequestLine(const char* begin,
     bool succeed = false;
     const char* start = begin;
     const char* space = std::find(start, end, ' ');
-    if (space != end && request_.setMethod(start, space)) {
-        //cout << request_.getMethod() << endl;
-       // cout << request_.methodString() << endl;
+    if (space != end && request_->setMethod(start, space)) {
         start = space + 1;
         space = std::find(start, end, ' ');
         if (space != end) {
             const char* question = std::find(start, space, '?');
             if (question != space) {
-                request_.setPath(start, question);
-               // cout << request_.getPath() << endl;
-                request_.setQuery(question, space);
-                //cout << request_.getQuery() << endl;
+                request_->setPath(start, question);
+               // cout << request_->getPath() << endl;
+                request_->setQuery(question, space);
+                //cout << request_->getQuery() << endl;
             } else {
-                request_.setPath(start, space);
-                //cout << request_.getPath() << endl;
+                request_->setPath(start, space);
+                //cout << request_->getPath() << endl;
             }
             start = space + 1;
             succeed = (end - start == 8) && std::equal(start, end-1, "HTTP/1.");
             if (succeed) {
                 if (*(end-1) == '1') {
-                    request_.setVersion(HttpRequest::kHttp11);
-                    //cout << request_.getVersion() << endl;
+                    request_->setVersion(HttpRequest::kHttp11);
+                    //cout << request_->getVersion() << endl;
                 }
                 else if (*(end-1) == '0') {
-                    request_.setVersion(HttpRequest::kHttp10);
+                    request_->setVersion(HttpRequest::kHttp10);
                     //cout << request_.getVersion() << endl;
                 }
                 else 
@@ -75,7 +73,7 @@ bool HttpParse::parseRequest(Buffer* buf)
                 const char* colon = std::find(buf->peek(), crlf, ':');
                 if (colon != crlf) {
                     std::cout << "find : " << std::endl;
-                    request_.addHeader(buf->peek(), colon, crlf);
+                    request_->addHeader(buf->peek(), colon, crlf);
                     //state_ = kExpectBody;
                 } else {
                     state_= kGotAll;

@@ -14,21 +14,21 @@ public:
         kExpectBody,
         kGotAll,        
     };
-    HttpParse(HttpRequest request)
+    HttpParse(HttpRequest* request)
         : state_(kExpectRequestLine),
            request_(request) 
     { }
 
     bool parseRequest(Buffer *buf);
     bool gotAll() const { return state_ == kGotAll; }
-    HttpRequest  getRequest() { return request_; }
-    void setRequest(HttpRequest request) { request_ = request; }
+    HttpRequest*  getRequest() { return request_; }
+    void setRequest(HttpRequest *request) { request_ = request; }
     //void resset();
 
 private:
     bool processRequestLine(const char* begin, const char* end);
     HttpRequestParseState state_;
-    HttpRequest request_;
+    HttpRequest *request_;
 };
 
 #endif

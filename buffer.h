@@ -269,6 +269,7 @@ public:
 
     size_t internalCapacity() const { return buffer_.capacity(); } 
     ssize_t readFd(int fd, int* savedErrno);
+    ssize_t writeFd(int fd, int* savedErrno);
 private:
     char* begin() { return &*buffer_.begin(); }
     const char* begin() const { return &*buffer_.cbegin(); }
