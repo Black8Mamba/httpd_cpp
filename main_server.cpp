@@ -30,7 +30,7 @@ int main()
     ThreadPool pool("MainThreadPool");
     Buffer buf;
     pool.setMaxQueueSize(7);
-    pool.start(4);
+    pool.start(1);
     EPoll poll(0);
     HttpRequest request;
     InetAddress addr(3001);
@@ -52,7 +52,6 @@ int main()
             continue;
         queue.handle_expire_timers();  //处理超时的请求
         for (int i = 0; i < num; ++i) {
-
             HttpRequest* request = static_cast<HttpRequest*>(poll.get_epoll_events()[i].data.ptr);
             if (request->getFd() == sockfd) {
                 InetAddress addr_client(0);
@@ -67,18 +66,13 @@ int main()
                 if ((poll.get_epoll_events()[i].events & EPOLLERR) || 
                     (poll.get_epoll_events()[i].events & EPOLLHUP)  || 
                     (!(poll.get_epoll_events()[i].events & EPOLLIN))) {
-                        std::cout << "etner !POLLIN" << endl;
-                        close(request->getFd());
+                        std::cout << "enter !POLLIN" << endl;
                         poll.epoll_del(request->getFd(), request, (EPOLLIN | EPOLLET | EPOLLONESHOT));
-                        delete request;
+                        CallBack::http_close_connect(request);
                         continue;
                     }                
-                pool.run(bind(CallBack::request, request, &queue));
+                pool.run(bind(CallBack::request, request, &queue, &poll));
             }
-            
-            continue;
-            error:
-                close(request->getFd());
         }
     }
 
