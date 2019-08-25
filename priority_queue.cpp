@@ -8,6 +8,7 @@
 
 #include "priority_queue.h"
 #include "http_request.h"
+#include "mutex.h"
 #include <iostream>
 using namespace std;
 
@@ -15,11 +16,11 @@ void yj_priority_queue::add_timer(HttpRequest* request,
                                   size_t timeout, 
                                 function<int(HttpRequest*)> func)
 {
+    MutexLockGuard guard(mutex_);
     cout << "enter add_timer" << endl;
     //申请timer节点
     yj_timer* timer_node = new yj_timer();
     timer_node->set_request(request);//timer需要request吗,需要的
-    //request->timer = timer_node;
     request->setTimer(timer_node);
     //更新当前时间
     yj_timer::time_update();
@@ -35,6 +36,7 @@ void yj_priority_queue::add_timer(HttpRequest* request,
 
 void yj_priority_queue::del_timer(HttpRequest* request)
 {
+    MutexLockGuard guard(mutex_);
     //更新当前时间
     yj_timer::time_update();   
     yj_timer* timer_node = request->getTimer();
@@ -43,28 +45,32 @@ void yj_priority_queue::del_timer(HttpRequest* request)
 
 void yj_priority_queue::handle_expire_timers(void)
 {
+    MutexLockGuard guard(mutex_);
     cout << "enter handle_timers" << endl;
     while(!is_empty()) {    
         yj_timer* timer_node = min(); //获取最小节点
         if (timer_node->is_deleted()) { //如果被标记为删除
             delmin(); //pop
+            cout << "111111" << endl;
+            cout << timer_node << endl;
             delete timer_node; //释放空间
             continue;
         }
         //更新当前时间
         yj_timer::time_update(); 
-        if (timer_node->get_key() > yj_timer::current_msec) {
+        if (timer_node->get_key() >= yj_timer::current_msec) {
             return; //未超时
+        } else {
+            //超时未被标记删除 调用handler处理，关闭后
+            if (timer_node->get_func()) {
+                function<int(HttpRequest*)> func = timer_node->get_func();
+                func(timer_node->get_request());
+                delmin();
+                cout << "33333333" << endl;
+                cout << timer_node << endl;
+                delete timer_node;
+            }
         }
-
-        //超时未被标记删除 调用handler处理
-        if (timer_node->get_func()) {
-            function<int(HttpRequest*)> func = timer_node->get_func();//考虑指针优化
-            func(timer_node->get_request());
-        }
-
-        delmin();
-        delete timer_node;
     }
 }
 

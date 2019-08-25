@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <iostream>
+#include "mutex.h"
 
 #define TIMEOUT_DEFAULT 500 //ms
 
@@ -23,10 +24,10 @@ public:
             key_(0),
             request_(NULL)
      { }  //需要更新当前时间吗？
-    void set_key(size_t key) { key_ = key; }
-    void set_deleted(bool deleted) { deleted_ = deleted; }
-    void set_handler(std::function<int(HttpRequest*)> func) { func_ = func; }
-    void set_request(HttpRequest* request) { request_ = request; }
+    void set_key(size_t key) { MutexLockGuard guard(mutex_); key_ = key; }
+    void set_deleted(bool deleted) { MutexLockGuard guard(mutex_); deleted_ = deleted; }
+    void set_handler(std::function<int(HttpRequest*)> func) { MutexLockGuard guard(mutex_); func_ = func; }
+    void set_request(HttpRequest* request) { MutexLockGuard guard(mutex_); request_ = request; }
 
     static void time_update();
 
@@ -42,6 +43,7 @@ private:
     bool deleted_; // 标记是否被删除
     std::function<int(HttpRequest*)> func_; // 超时处理，add时指定
     HttpRequest* request_; //http请求
+    MutexLock mutex_;
 };
 
 #endif

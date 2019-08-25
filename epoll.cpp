@@ -18,6 +18,7 @@ EPoll::~EPoll()
 
 int EPoll::epoll_add(int fd, HttpRequest* request, int events)
 {
+   // MutexLockGuard guard(mutex_);
     struct epoll_event event;
     memset(&event, 0, sizeof(event));
     event.data.ptr = static_cast<void*>(request);
@@ -29,6 +30,7 @@ int EPoll::epoll_add(int fd, HttpRequest* request, int events)
 
 int EPoll::epoll_mod(int fd, HttpRequest* request, int events)
 {
+   // MutexLockGuard guard(mutex_);
     struct epoll_event event;
     memset(&event, 0, sizeof(event));
     event.data.ptr = static_cast<void*>(request);
@@ -40,6 +42,7 @@ int EPoll::epoll_mod(int fd, HttpRequest* request, int events)
 
 int EPoll::epoll_del(int fd, HttpRequest* request, int events)
 {
+    //MutexLockGuard guard(mutex_);
     struct epoll_event event;
     memset(&event, 0, sizeof(event));
     event.data.ptr = static_cast<void*>(request);
@@ -51,6 +54,7 @@ int EPoll::epoll_del(int fd, HttpRequest* request, int events)
 
 int EPoll::epoll_wait(int max_events, int timeout_ms)
 {
+//    MutexLockGuard guard(mutex_);
     int num_events = ::epoll_wait(epoll_fd_, 
                                     &*events_.begin(),
                                     static_cast<int>(events_.size()),

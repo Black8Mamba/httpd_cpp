@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <vector>
+#include "mutex.h"
 
 #define MAXEVENTS   1024
 
@@ -33,6 +34,7 @@ private:
     int epoll_fd_;
     EventList events_;
     int num_events_;
+    MutexLock mutex_;
 };
 
 #endif

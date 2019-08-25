@@ -39,7 +39,7 @@ public:
     size_t size(void) { return yj_pq_.size(); }
 
 
-private:
+public:
     bool is_empty(void) { return yj_pq_.empty(); }
     
     yj_timer* min(void) { return yj_pq_.top(); }
@@ -48,6 +48,7 @@ private:
 
 private:
     priority_queue<yj_timer*, vector<yj_timer*>, timer_comp>  yj_pq_;
+    MutexLock mutex_;
 };
 
 #endif

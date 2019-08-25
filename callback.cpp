@@ -30,12 +30,13 @@ namespace CallBack
         HttpResponse response(false);
         struct stat sbuf;
         string path("/home/yongjie/httpd");   
+        int count = 0;
         while(1) {
             int n = buf.readFd(request->getFd(), &errno_);
             if (n == 0) {
                 std::cout << "n=0" << endl;
                 cout << "fd:" << request->getFd() << endl;
-                goto error;
+                goto error; //
             }
             if (n < 0 && (errno != EAGAIN)) {
                 std::cout << "n<0 !EAGAIN" << endl;
@@ -59,6 +60,8 @@ namespace CallBack
         if (stat(path.c_str(), &sbuf) < 0) {
             cout << "file doesn't exit" << endl;
             response.setStatusCode(HttpResponse::HttpStatusCode::k404NotFound);
+            response.setBody("<html>");
+            response.setContentType(string("test/html"));
         } else if (!(S_ISREG((sbuf).st_mode)) || !(S_IRUSR & (sbuf).st_mode)) {
             //判断权限正确
             cout << "file can't read" << endl;
@@ -74,32 +77,34 @@ namespace CallBack
             response.setBody(string(src_addr, sbuf.st_size));
             close(src_fd);
             munmap(src_addr, sbuf.st_size);
+        }
+        response.setStatusMessage(response.getMessageFromStatus());//设置message;
             buf.retrieveAll();
             response.appendToBuffer(&buf);
-            int count = buf.writeFd(request->getFd(), &errno_);
+            count = buf.writeFd(request->getFd(), &errno_);
             cout << "write count: " << count << endl;
             if (count == sbuf.st_size)
                 cout << "all size is send" << endl;
-        }
-        response.setStatusMessage(response.getMessageFromStatus());//设置message;
 
-        if (response.closeConnection())
+        if (response.closeConnection()) {
+            cout << "close:"  << response.closeConnection() << endl;
             goto error;
+        }
+            
 
         queue->add_timer(request, 2000, http_close_connect);//重置定时器,不断开连接
         poll->epoll_mod(request->getFd(), request, (EPOLLIN | EPOLLET | EPOLLONESHOT));
         return;
     error:
-        //CallBack::http_close_connect(request);
         ::close(request->getFd());
+        delete request;
     }
 
     int http_close_connect(HttpRequest* request)
     {
-       //cout << "close fd: " << request->getFd() << endl;
+        cout << "close fd: " << request->getFd() << endl;
         ::close(request->getFd());
-        //delete request;  //close时释放request
-        //Epoll_del
+        delete request;  //close时释放request
         return 0;
     }
 
