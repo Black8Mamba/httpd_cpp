@@ -35,7 +35,8 @@ public:
 
     bool setMethod(const char* start, const char* end) 
     {
-        assert(method_ == kInvalid);
+        std::cout << method_ << std::endl;
+       // assert(method_ == kInvalid);
         string m(start, end);
         if (m == "GET")
             method_ = kGet;
@@ -148,6 +149,8 @@ public:
 
     void setFd(int fd) { fd_ = fd; }
     int getFd() { return fd_; }
+
+
 private:
     int fd_;
     int epoll_fd_;

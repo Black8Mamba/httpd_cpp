@@ -21,6 +21,7 @@ namespace CallBack
 {          
     void request(HttpRequest* request, yj_priority_queue* queue, EPoll* poll)
     {
+        cout << "enter request" << endl;
         queue->del_timer(request); //处理请求，删除定时器
 
         Buffer buf;
@@ -28,15 +29,17 @@ namespace CallBack
         HttpParse parse(request);
         HttpResponse response(false);
         struct stat sbuf;
-        string path("/home/yongjie/httpd");
+        string path("/home/yongjie/httpd");   
         while(1) {
             int n = buf.readFd(request->getFd(), &errno_);
             if (n == 0) {
                 std::cout << "n=0" << endl;
+                cout << "fd:" << request->getFd() << endl;
                 goto error;
             }
             if (n < 0 && (errno != EAGAIN)) {
                 std::cout << "n<0 !EAGAIN" << endl;
+                cout << strerror(errno_)<< endl;
                 goto error;
             }
             if (n < 0 && (errno == EAGAIN)) {
@@ -87,14 +90,16 @@ namespace CallBack
         poll->epoll_mod(request->getFd(), request, (EPOLLIN | EPOLLET | EPOLLONESHOT));
         return;
     error:
-        CallBack::http_close_connect(request);
+        //CallBack::http_close_connect(request);
+        ::close(request->getFd());
     }
 
     int http_close_connect(HttpRequest* request)
     {
-       cout << "close fd: " << request->getFd() << endl;
+       //cout << "close fd: " << request->getFd() << endl;
         ::close(request->getFd());
         //delete request;  //close时释放request
+        //Epoll_del
         return 0;
     }
 

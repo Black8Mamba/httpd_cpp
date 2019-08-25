@@ -45,7 +45,6 @@ void yj_priority_queue::handle_expire_timers(void)
 {
     cout << "enter handle_timers" << endl;
     while(!is_empty()) {    
-        //cout << "queue.size():" << this->size() << endl;
         yj_timer* timer_node = min(); //获取最小节点
         if (timer_node->is_deleted()) { //如果被标记为删除
             delmin(); //pop
@@ -58,7 +57,7 @@ void yj_priority_queue::handle_expire_timers(void)
             return; //未超时
         }
 
-        //超时未被删除 调用handler处理
+        //超时未被标记删除 调用handler处理
         if (timer_node->get_func()) {
             function<int(HttpRequest*)> func = timer_node->get_func();//考虑指针优化
             func(timer_node->get_request());
