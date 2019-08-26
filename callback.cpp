@@ -13,9 +13,11 @@
        #include <fcntl.h>
        #include <sys/mman.h>
 
-
 #include <iostream>
+#include <unordered_set>
 using namespace std;
+
+extern unordered_set<HttpRequest*> ptr_set;
 
 namespace CallBack
 {          
@@ -105,6 +107,7 @@ namespace CallBack
         cout << "close fd: " << request->getFd() << endl;
         ::close(request->getFd());
         delete request;  //close时释放request
+        ptr_set.insert(request);
         return 0;
     }
 

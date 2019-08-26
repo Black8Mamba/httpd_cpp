@@ -19,11 +19,16 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <cassert>
+#include <unordered_set>
+
+using std::unordered_set;
 
 
 
 using namespace std;
 
+
+unordered_set<HttpRequest*> ptr_set;
 
 int main()
 {
@@ -63,10 +68,12 @@ int main()
         for (int i = 0; i < num; ++i) { 
             HttpRequest* request = static_cast<HttpRequest*>(poll.get_epoll_events()[i].data.ptr);
             cout << "request addr: " << request << endl;
-            if (request == NULL) {
-                cout << "timeout!" << endl;
+            if (ptr_set.count(request)) {
+                cout << "find deleted request" << endl;
+                ptr_set.erase(request);
                 continue;
             }
+            
             if (request->getFd() == sockfd) { //监听描述符
                 InetAddress addr_client(0);
                 int connfd = socket.accept(&addr_client); //可能有多个客户端accept,如何处理，while
