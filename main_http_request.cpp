@@ -8,15 +8,10 @@
 using namespace std;
 using namespace std::placeholders;  
 
-void hello(void)
-{
-    cout << "func: hello" << endl;
-}
-
 //处理Connection选项
 void http_process_connection(HttpRequest *request, HttpResponse *response)
 {
-    cout << "http_process_connection" << endl;
+    //cout << "http_process_connection" << endl;
     if (request->headers().count("Connection") != 0) {
         if (request->headers()["Connection"] == "keep-alive")
             response->setCloseConnection(false);
@@ -35,15 +30,15 @@ int main(void)
     buf.append(s, sizeof(s));
     parse.parseRequest(&buf);
     HttpRequest *request = parse.getRequest();
-    cout << request->methodString() << endl;
-    cout << request->getVersion() << endl;
-    cout << request->getPath() << endl;
-    cout <<  request->getHeader("Host") << endl;
-    cout << request->getHeader("Connection") << endl;
+    //cout << request->methodString() << endl;
+    //cout << request->getVersion() << endl;
+    //cout << request->getPath() << endl;
+    //cout <<  request->getHeader("Host") << endl;
+    //cout << request->getHeader("Connection") << endl;
     HttpResponse response(true);
-    cout << "close connection: " << response.closeConnection() << endl;
+    //cout << "close connection: " << response.closeConnection() << endl;
     request->addHeaderFunc("Host", std::bind(http_process_connection, request, &response));
     request->handleFunc();
-    cout << "close connection: " << response.closeConnection() << endl;
+    //cout << "close connection: " << response.closeConnection() << endl;
     return 0;
 }

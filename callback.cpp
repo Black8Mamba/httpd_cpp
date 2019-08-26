@@ -6,13 +6,11 @@
 #include "http_parse.h"
 #include "http_response.h"
 #include "epoll.h"
-
-       #include <sys/types.h>
-       #include <sys/stat.h>
-       #include <unistd.h>
-       #include <fcntl.h>
-       #include <sys/mman.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/mman.h>
 #include <iostream>
 #include <unordered_set>
 using namespace std;
@@ -23,7 +21,7 @@ namespace CallBack
 {          
     void request(HttpRequest* request, yj_priority_queue* queue, EPoll* poll)
     {
-        cout << "enter request" << endl;
+        //cout << "enter request" << endl;
         queue->del_timer(request); //处理请求，删除定时器
 
         Buffer buf;
@@ -35,18 +33,18 @@ namespace CallBack
         int count = 0;
         while(1) {
             int n = buf.readFd(request->getFd(), &errno_);
-            if (n == 0) {
-                std::cout << "n=0" << endl;
-                cout << "fd:" << request->getFd() << endl;
+            if (n == 0) { //对端关闭
+                //std:://cout << "n=0" << endl;
+                //cout << "fd:" << request->getFd() << endl;
                 goto error; //
             }
-            if (n < 0 && (errno != EAGAIN)) {
-                std::cout << "n<0 !EAGAIN" << endl;
-                cout << strerror(errno_)<< endl;
+            if (n < 0 && (errno != EAGAIN)) {  //其他错误
+                //std:://cout << "n<0 !EAGAIN" << endl;
+                //cout << strerror(errno_)<< endl;
                 goto error;
             }
             if (n < 0 && (errno == EAGAIN)) {
-                std::cout << "n<0 == EAGAIN" << endl;
+                //std:://cout << "n<0 == EAGAIN" << endl;
                 break;
             }
         }
@@ -60,17 +58,17 @@ namespace CallBack
         //判断文件存在
         path.append(request->getPath());
         if (stat(path.c_str(), &sbuf) < 0) {
-            cout << "file doesn't exit" << endl;
+            //cout << "file doesn't exit" << endl;
             response.setStatusCode(HttpResponse::HttpStatusCode::k404NotFound);
             response.setBody("<html>");
             response.setContentType(string("test/html"));
         } else if (!(S_ISREG((sbuf).st_mode)) || !(S_IRUSR & (sbuf).st_mode)) {
             //判断权限正确
-            cout << "file can't read" << endl;
+            //cout << "file can't read" << endl;
             response.setStatusCode(HttpResponse::HttpStatusCode::k403Fobidden);
         } else {
             //无错误
-            cout << "open file success" << endl;
+            //cout << "open file success" << endl;
             response.setStatusCode(HttpResponse::HttpStatusCode::k200Ok);
             response.setContentType(string("text/html"));
 
@@ -84,12 +82,12 @@ namespace CallBack
             buf.retrieveAll();
             response.appendToBuffer(&buf);
             count = buf.writeFd(request->getFd(), &errno_);
-            cout << "write count: " << count << endl;
+            //cout << "write count: " << count << endl;
             if (count == sbuf.st_size)
-                cout << "all size is send" << endl;
+                //cout << "all size is send" << endl;
 
-        if (response.closeConnection()) {
-            cout << "close:"  << response.closeConnection() << endl;
+        if (response.closeConnection()) { //关闭连接
+            //cout << "close:"  << response.closeConnection() << endl;
             goto error;
         }
             
@@ -98,14 +96,14 @@ namespace CallBack
         poll->epoll_mod(request->getFd(), request, (EPOLLIN | EPOLLET | EPOLLONESHOT));
         return;
     error:
-        //::close(request->getFd());
-        //delete request; //对端关闭的情况，不会再有事件过来？
-        CallBack::http_close_connect(request);
+        ::close(request->getFd());
+        delete request; //对端关闭的情况，不会再有事件过来？
+        //CallBack::http_close_connect(request);
     }
 
     int http_close_connect(HttpRequest* request)
     {
-        cout << "close fd: " << request->getFd() << endl;
+        //cout << "close fd: " << request->getFd() << endl;
         ::close(request->getFd());
         delete request;  //close时释放request
         ptr_set.insert(request);

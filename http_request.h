@@ -37,7 +37,7 @@ public:
 
     bool setMethod(const char* start, const char* end) 
     {
-        std::cout << method_ << std::endl;
+        //std::cout << method_ << std::endl;
        // assert(method_ == kInvalid);
         string m(start, end);
         if (m == "GET")

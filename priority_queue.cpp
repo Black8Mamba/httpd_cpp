@@ -17,7 +17,7 @@ void yj_priority_queue::add_timer(HttpRequest* request,
                                 function<int(HttpRequest*)> func)
 {
     MutexLockGuard guard(mutex_);
-    cout << "enter add_timer" << endl;
+    //cout << "enter add_timer" << endl;
     //申请timer节点
     //yj_timer* timer_node = new yj_timer();
     shared_ptr<yj_timer> timer_node = make_shared<yj_timer>();
@@ -43,7 +43,7 @@ void yj_priority_queue::del_timer(HttpRequest* request)
     weak_ptr<yj_timer> timer_node = request->getTimer();
     if (shared_ptr<yj_timer> p = timer_node.lock()) {
         p->set_deleted(true);
-        cout << "promoted success" << endl;
+        //cout << "promoted success" << endl;
     }
         
 }
@@ -51,13 +51,13 @@ void yj_priority_queue::del_timer(HttpRequest* request)
 void yj_priority_queue::handle_expire_timers(void)
 {
     MutexLockGuard guard(mutex_);
-    cout << "enter handle_timers" << endl;
+    //cout << "enter handle_timers" << endl;
     while(!is_empty()) {    
         shared_ptr<yj_timer> timer_node = min(); //获取最小节点
         if (timer_node->is_deleted()) { //如果被标记为删除
             delmin(); //pop
-            cout << "111111" << endl;
-            cout << timer_node << endl;
+            //cout << "111111" << endl;
+            //cout << timer_node << endl;
             //delete timer_node; //释放空间
             continue;
         }
@@ -72,8 +72,8 @@ void yj_priority_queue::handle_expire_timers(void)
                 HttpRequest *p = timer_node->get_request();
                 func(p); //删除了request？
                 delmin();
-                cout << "33333333" << endl;
-                cout << timer_node << endl;
+                //cout << "33333333" << endl;
+                //cout << timer_node << endl;
                 //delete timer_node;
             }
         }

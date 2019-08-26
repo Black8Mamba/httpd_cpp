@@ -13,6 +13,6 @@ int main(void)
     response.setStatusMessage(response.getMessageFromStatus());
     response.appendToBuffer(&buf);
     string s = buf.retrieveAllAsString();
-    cout << s << endl;
+   // cout << s << endl;
     return 0;
 }

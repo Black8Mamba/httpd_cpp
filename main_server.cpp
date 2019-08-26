@@ -47,8 +47,8 @@ int main()
     InetAddress addr(3001);
     int sockfd = sockets::create_nonblock_socket(AF_INET);
     assert(sockfd > 0);
-    request.setFd(sockfd);
-    cout << "sockfd:" << sockfd << endl;
+    request.setFd(sockfd);//
+    //cout << "sockfd:" << sockfd << endl;
     Socket socket(sockfd);
     socket.setReuseAddr(true);
     socket.bindAddress(addr);
@@ -62,15 +62,15 @@ int main()
         poll.epoll_wait(1024, -1);
         int num = poll.get_epoll_num_events();
         assert(num >= 0);
-        std::cout << "num_events:" << num << endl;
+        //std::cout << "num_events:" << num << endl;
         if (num == 0)
             continue;
         queue.handle_expire_timers();  //处理超时的请求,超时了关闭fd，删除了requet，下面又进行处理？
         for (int i = 0; i < num; ++i) { 
             HttpRequest* request = static_cast<HttpRequest*>(poll.get_epoll_events()[i].data.ptr);
-            cout << "request addr: " << request << endl;
+       //     cout << "request addr: " << request << endl;
             if (ptr_set.count(request)) {
-                cout << "find deleted request" << endl;
+           //     cout << "find deleted request" << endl;
                 ptr_set.erase(request);
                 continue;
             }
@@ -79,26 +79,26 @@ int main()
                 InetAddress addr_client(0);
                 int connfd = socket.accept(&addr_client); //可能有多个客户端accept,如何处理，while
                 assert(connfd >= 0);
-                cout << "connfd connect:" << connfd << endl;
+           //     cout << "connfd connect:" << connfd << endl;
                 HttpRequest *re = new HttpRequest();  //接受连接时申请request；什么时候释放？close的时候，如何保证close一次
                 re->setFd(connfd);
                 queue.add_timer(re, 500, CallBack::http_close_connect);//加入超时队列，超时时间500ms
                 int ret = poll.epoll_add(connfd, re, (EPOLLIN | EPOLLET | EPOLLONESHOT));//add epoll
                 assert(ret == 0);
             } else {
-                cout << "connfd read:" << request->getFd() << endl;
+           //     cout << "connfd read:" << request->getFd() << endl;
                    if ((poll.get_epoll_events()[i].events & EPOLLERR) || 
                         (poll.get_epoll_events()[i].events & EPOLLRDHUP) || 
                         !(poll.get_epoll_events()[i].events & EPOLLIN)) {
                         //移出定时器队列，close fd, delete request;
-                        cout << "!EPOLLINN" << endl;
+                   //     cout << "!EPOLLINN" << endl;
                         queue.del_timer(request);
                         ::close(request->getFd());
                         poll.epoll_del(request->getFd(), request, (EPOLLIN | EPOLLET | EPOLLONESHOT));
-                        //delete request;
-                        CallBack::http_close_connect(request);
+                        delete request;
+                        //CallBack::http_close_connect(request);
                    }else if(poll.get_epoll_events()[i].events & EPOLLIN) { 
-                       cout << "Pollin" << endl;
+                  //     cout << "Pollin" << endl;
                        pool.run(bind(CallBack::request, request, &queue, &poll)); //queue poll 线程安全？
                        //CallBack::request(request, &queue, &poll);
                    }
