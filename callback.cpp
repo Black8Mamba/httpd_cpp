@@ -94,12 +94,13 @@ namespace CallBack
         }
             
 
-        queue->add_timer(request, 2000, http_close_connect);//重置定时器,不断开连接
+        queue->add_timer(request, 500, http_close_connect);//重置定时器,不断开连接
         poll->epoll_mod(request->getFd(), request, (EPOLLIN | EPOLLET | EPOLLONESHOT));
         return;
     error:
-        ::close(request->getFd());
-        delete request;
+        //::close(request->getFd());
+        //delete request; //对端关闭的情况，不会再有事件过来？
+        CallBack::http_close_connect(request);
     }
 
     int http_close_connect(HttpRequest* request)

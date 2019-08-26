@@ -58,6 +58,7 @@ int main()
     yj_priority_queue queue;  //定时器的优先级队列
 
     while(1) {
+        ptr_set.clear();
         poll.epoll_wait(1024, -1);
         int num = poll.get_epoll_num_events();
         assert(num >= 0);
@@ -94,7 +95,8 @@ int main()
                         queue.del_timer(request);
                         ::close(request->getFd());
                         poll.epoll_del(request->getFd(), request, (EPOLLIN | EPOLLET | EPOLLONESHOT));
-                        delete request;
+                        //delete request;
+                        CallBack::http_close_connect(request);
                    }else if(poll.get_epoll_events()[i].events & EPOLLIN) { 
                        cout << "Pollin" << endl;
                        pool.run(bind(CallBack::request, request, &queue, &poll)); //queue poll 线程安全？
