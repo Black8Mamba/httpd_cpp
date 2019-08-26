@@ -8,8 +8,11 @@
 #include "timer.h"
 #include "buffer.h"
 #include <functional>
-using std::string;
 #include <iostream>
+#include <memory>
+using std::string;
+using std::weak_ptr;
+
 
 class HttpRequest
 {
@@ -25,8 +28,7 @@ public:
 
     HttpRequest()
         : method_(kInvalid),
-            version_(kUnknown),
-            timer_(NULL)
+            version_(kUnknown)
     { }
 
     void setVersion(Version v) { version_ = v; }
@@ -87,9 +89,9 @@ public:
         path_.assign(start, end);
     }
 
-    void setTimer(yj_timer* timer) { timer_ = timer; }
+    void setTimer(weak_ptr<yj_timer> timer) { timer_ = timer; }
 
-    yj_timer* getTimer() { return timer_; }
+    weak_ptr<yj_timer> getTimer() { return timer_; }
 
     const string& getPath() const { return path_; }
 
@@ -158,7 +160,8 @@ private:
     Version version_;
     string path_;
     string query_;
-    yj_timer *timer_;
+    //weak_ptr<yj_timer> timer_;
+    weak_ptr<yj_timer> timer_;
     std::map<string,string> headers_;
     std::map<string, std::function<void(void)>> func_; //header处理函数函数？
 };

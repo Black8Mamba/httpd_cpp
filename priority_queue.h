@@ -12,16 +12,19 @@
 #include <vector>
 #include "timer.h"
 #include <functional>
+#include <memory>
 
 using std::priority_queue;
 using std::vector;
 using std::function;
+using std::shared_ptr;
+using std::weak_ptr;
 
 class HttpRequest;
 
 struct timer_comp //重写仿函数
 {
-    bool operator() (yj_timer* a, yj_timer* b) 
+    bool operator() (shared_ptr<yj_timer> a, shared_ptr<yj_timer> b) 
     {
         return a->get_key() > b->get_key();
     }
@@ -42,12 +45,13 @@ public:
 public:
     bool is_empty(void) { return yj_pq_.empty(); }
     
-    yj_timer* min(void) { return yj_pq_.top(); }
+    shared_ptr<yj_timer> min(void) { return yj_pq_.top(); }
     void delmin(void) {  yj_pq_.pop(); }
-    void insert(yj_timer* timer) { yj_pq_.push(timer); }
+    void insert(shared_ptr<yj_timer> timer) { yj_pq_.push(timer); }
 
 private:
-    priority_queue<yj_timer*, vector<yj_timer*>, timer_comp>  yj_pq_;
+    //priority_queue<yj_timer*, vector<yj_timer*>, timer_comp>  yj_pq_;
+    priority_queue<shared_ptr<yj_timer>, vector<shared_ptr<yj_timer>>, timer_comp> yj_pq_;
     MutexLock mutex_;
 };
 

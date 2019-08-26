@@ -11,6 +11,8 @@
 #include <functional>
 #include <iostream>
 #include "mutex.h"
+#include <memory>
+using std::shared_ptr;
 
 #define TIMEOUT_DEFAULT 500 //ms
 

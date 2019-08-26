@@ -28,7 +28,7 @@ public:
 private:
     bool processRequestLine(const char* begin, const char* end);
     HttpRequestParseState state_;
-    HttpRequest *request_;
+    HttpRequest* request_;
 };
 
 #endif
